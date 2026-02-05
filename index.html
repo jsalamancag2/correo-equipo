@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Enviar correo del equipo</title>
+</head>
+<body>
+
+  <h2>Enviar correo del equipo</h2>
+
+  <p><b>Correo destino:</b> jsalamancag2@ucentral.edu.co</p>
+
+  <p>URL del repositorio GitHub:</p>
+  <input id="repo" type="text" size="60"
+         placeholder="https://github.com/usuario/repositorio">
+
+  <p>Integrantes del equipo (uno por línea):</p>
+  <textarea id="names" rows="6" cols="60"
+            placeholder="Nombre 1&#10;Nombre 2&#10;Nombre 3"></textarea>
+
+  <br><br>
+  <button id="btnEnviar" onclick="enviarCorreo()">Enviar correo</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <script>
+    const PUBLIC_KEY  = "fDmQYDaHBKa_4Nxjh";
+    const SERVICE_ID  = "service_c6iz267";
+    const TEMPLATE_ID = "template_od7r47a";
+
+    emailjs.init(PUBLIC_KEY);
+
+    function enviarCorreo() {
+      const repo = document.getElementById("repo").value.trim();
+      const namesText = document.getElementById("names").value.trim();
+      const btn = document.getElementById("btnEnviar");
+
+      if (!repo) {
+        alert("Debes ingresar el URL del repositorio GitHub");
+        return;
+      }
+
+      if (!namesText) {
+        alert("Debes ingresar los nombres del equipo");
+        return;
+      }
+
+      const integrantes = namesText
+        .split("\n")
+        .map(n => n.trim())
+        .filter(n => n !== "");
+
+      const mensaje =
+        "Integrantes del equipo:\n" +
+        integrantes.map(n => "- " + n).join("\n") +
+        "\n\nURL del repositorio en GitHub:\n" +
+        repo;
+
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
+
+      emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+        subject: "Entrega: Integrantes del equipo + URL GitHub",
+        message: mensaje
+      })
+      .then(() => {
+        alert("✅ Correo enviado correctamente");
+        btn.textContent = "Enviar correo";
+        btn.disabled = false;
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("❌ Error al enviar el correo");
+        btn.textContent = "Enviar correo";
+        btn.disabled = false;
+      });
+    }
+  </script>
+
+</body>
+</html>
